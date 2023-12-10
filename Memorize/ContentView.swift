@@ -23,18 +23,23 @@ struct ContentView: View {
 }
 
 struct CardView: View {
-    var isFaceUp: Bool = false // vars in structs require a value, ex) default value
+    @State var isFaceUp = false // type inference, vars in structs require a value, ex) default value
     
     var body: some View {
         ZStack {
+            let base = RoundedRectangle(cornerRadius: 12) // type inference, locals in @ViewBuilder
             if isFaceUp {
-                RoundedRectangle(cornerRadius: 12).foregroundColor(.white)
-                RoundedRectangle(cornerRadius: 12)
-                    .strokeBorder(lineWidth: 2) // behaves like a View, behaves like a Shape
+                base.foregroundColor(.white)
+                base.strokeBorder(lineWidth: 2) // behaves like a View, behaves like a Shape
                 Text("🐧").font(.largeTitle)
             } else {
-                RoundedRectangle(cornerRadius: 12)
+                base
             }
+        }.onTapGesture {
+            print("Tapped")
+            //isFaceUp = !isFaceUp // Views (self) including their vars are immutable, need to add @State
+            // isFaceUp = !isFaceUp
+            isFaceUp.toggle()
         }
     }
 }
