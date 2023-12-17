@@ -10,64 +10,110 @@ import SwiftUI
 
 
 struct ContentView: View {
-    let emojis: [String] = ["🐧","🐥","🐓","🐧", "🦚", "🦃", "🪿", "🦤", "🦩"]
-    @State var cardCount = 4
+    @State var emojis = Theme.bird.getEmojis().shuffled()
+    @State var cardColor = Theme.bird.getCardColor()
     
     var body: some View {
         VStack {
+            Text("Memorize!")
+                .font(.largeTitle)
             ScrollView {
                 cards
             }
             Spacer()
-            cardCountAdjusters
+            ThemePicker(availableThemes: [Theme.bird, Theme.flower, Theme.ocean]) { theme in
+                self.emojis = theme.getEmojis().shuffled()
+                self.cardColor = theme.getCardColor()
+            }
         }
         .padding()
     }
     
-    var cardCountAdjusters: some View {
-        HStack {
-            cardRemover
-            Spacer()
-            cardAdder
-        }
-        .imageScale(.large)
-        .font(.largeTitle)
-    }
-    
     var cards: some View {
         // implicit return, this is not a view builder, just a normal function with one line of code, don't need an explicit return (same with computed properties)
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 120, maximum: 120))]) {
-            ForEach(0..<cardCount, id: \.self) { index in // index is an argument to the closure
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 60, maximum: 120))]) {
+            ForEach(0..<emojis.count, id: \.self) { index in // index is an argument to the closure
                 CardView(content: emojis[index])
                     .aspectRatio(2/3, contentMode: .fit)
             }
         }
-        .foregroundColor(.orange)
+        .foregroundColor(cardColor)
+    }
+}
+
+enum Theme {
+    case bird, ocean, flower
+    
+    func getImageSymbol() -> String {
+        switch self {
+        case .bird:
+            "bird.fill"
+        case .flower:
+            "globe"
+        case .ocean:
+            "water.waves"
+        }
     }
     
-    // internal vs external parameter names, by = label that callers use, offset = label that we use in the function
-    // symbol is both the internal and external parameter name
-    func cardCountAdjuster(by offset: Int, symbol: String) -> some View {
-        Button(action: {
-            cardCount += offset
-        }, label: {
-            Image(systemName: symbol)
-        })
-        .disabled(cardCount + offset < 1 || cardCount + offset > emojis.count)
+    func getLabel() -> String {
+        switch self {
+        case .bird:
+            "Birds"
+        case .ocean:
+            "Ocean"
+        case .flower:
+            "Flower"
+        }
     }
     
-    var cardRemover: some View {
-        cardCountAdjuster(by: -1, symbol: "rectangle.stack.fill.badge.minus")
+    func getEmojis() -> [String] {
+        switch self {
+        case .bird:
+            ["🐧","🐧","🐥","🐥","🐓","🐓","🦚","🦚","🦃", "🪿", "🦤", "🦩"]
+        case .ocean:
+            ["🐟","🐟","🦀","🦀","🐙","🐙","🐬","🐬","🐳","🦑","🐡"]
+        case .flower:
+            ["🌹","🌹","🌸","🌸","💐","💐","🌺","🌺","🌻","🪷","🪻"]
+        }
     }
     
-    var cardAdder: some View {
-        cardCountAdjuster(by: +1, symbol: "rectangle.stack.fill.badge.plus")
+    func getCardColor() -> Color {
+        switch self {
+        case .bird:
+            Color.black
+        case .ocean:
+            Color.blue
+        case .flower:
+            Color.pink
+        }
+    }
+}
+
+struct ThemePicker: View {
+    let availableThemes: [Theme]
+    let onThemeSelected: ((Theme) -> Void)
+    
+    var body: some View {
+        HStack(alignment: VerticalAlignment.lastTextBaseline) {
+            ForEach(0..<availableThemes.count, id: \.self) { index in
+                Button(action: {
+                    onThemeSelected(availableThemes[index])
+                }, label: {
+                    VStack {
+                        Image(systemName: availableThemes[index].getImageSymbol())
+                        Text(availableThemes[index].getLabel())
+                    }.frame(maxWidth: .infinity)
+                })
+                .font(.callout)
+                .imageScale(.large)
+            }
+        }
     }
 }
 
 struct CardView: View {
     let content: String
-    @State var isFaceUp = true // type inference, vars in structs require a value, ex) default value
+    @State var isFaceUp = false // type inference, vars in structs require a value, ex) default value
     
     var body: some View {
         ZStack {
