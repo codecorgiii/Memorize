@@ -10,18 +10,11 @@
 import SwiftUI
 
 class EmojiMemoryGame: ObservableObject {
-    private static let emojis = ["🕊️", "🦅", "🦆", "🦜", "🐧", "🦉", "🐤", "🐥", "🦢", "🐓", "🦩", "🦚", "🦃"] // emojis is static but namespaced in the EmojiMemoryGame class. statics are initialized before init
-    // property initializers run before self is available, static vars and funcs
-    // order of property (member) initialization is undetermined - not in the order declared in the source code
-        
-    private static func createMemoryGame() -> MemoryGame<String> { // return types always need to be explicit in swift
-        return MemoryGame<String>(numberOfPairsOfCards: 4) { pairIndex in
-            if emojis.indices.contains(pairIndex) {
-                return emojis[pairIndex]
-            } else {
-                return "⁉️"
-            }
-        } // closure syntax, trailing closure syntax
+    private(set) var currentTheme = Theme.cat
+
+    private static func createMemoryGame(theme: Theme = Theme.cat) -> MemoryGame<String> {
+
+        return MemoryGame<String>(numberOfPairsOfCards: theme.numberOfPairs) {_ in theme.emojis.randomElement() ?? theme.emojis.first!}
     }
     
     // @Published - if this var  changes, it'll tell "something changed" to the UI
@@ -29,6 +22,21 @@ class EmojiMemoryGame: ObservableObject {
     
     var cards: [MemoryGame<String>.Card] {
         return model.cards
+    }
+    
+    var score: Int {
+        return model.score
+    }
+    
+    var cardColor: Color {
+        switch currentTheme.color {
+        case "gray": .gray
+        case "brown": .brown
+        case "orange": .orange
+        case "yellow": .yellow
+        case "blue": .blue
+        default: .black
+        }
     }
     
     // MARK: - Intents
@@ -39,5 +47,11 @@ class EmojiMemoryGame: ObservableObject {
     
     func choose(_ card: MemoryGame<String>.Card) {
         model.chooseCard(card)
+    }
+    
+    func newGame() {
+        let newTheme = Theme.allCases.filter({$0.self != currentTheme }).randomElement() ?? Theme.bird
+        model = EmojiMemoryGame.createMemoryGame(theme: newTheme)
+        currentTheme = newTheme
     }
 }

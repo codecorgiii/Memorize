@@ -12,9 +12,11 @@ import Foundation // includes arrays, ints, bools, dictionaries
 struct MemoryGame<CardContent> where CardContent : Equatable { // the wider the scope the generic ("don't care") is placed, the more it'll apply to the sub-structs
     // access control for setter only
     private(set) var cards: [Card]
+    private(set) var score: Int
     
     init(numberOfPairsOfCards: Int, cardContentFactory: (Int) -> CardContent) {
         self.cards = []
+        self.score = 0
         for pairIndex in 0..<max(2,numberOfPairsOfCards) {
             let content = cardContentFactory(pairIndex)
             cards.append(Card(content: content, id: "\(pairIndex+1)a"))
@@ -40,11 +42,16 @@ struct MemoryGame<CardContent> where CardContent : Equatable { // the wider the 
                     if cards[chosenIndex].content == cards[potentialMatchIndex].content {
                         cards[chosenIndex].isMatched = true
                         cards[potentialMatchIndex].isMatched = true
+                        score += 2
                     }
                 } else {
                     indexOfTheOneAndOnlyFaceUpCard = nil
+                    if cards[chosenIndex].isPreviouslySeen {
+                        score -= 1
+                    }
                 }
                 cards[chosenIndex].isFaceUp.toggle()
+                cards[chosenIndex].isPreviouslySeen = true
             }
         }
     }
@@ -59,6 +66,7 @@ struct MemoryGame<CardContent> where CardContent : Equatable { // the wider the 
     struct Card: Equatable, Identifiable, CustomDebugStringConvertible {
         var isFaceUp = false
         var isMatched = false
+        var isPreviouslySeen = false
         let content: CardContent
         
         var id: String

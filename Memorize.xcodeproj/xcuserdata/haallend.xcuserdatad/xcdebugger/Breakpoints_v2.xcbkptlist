@@ -14,10 +14,10 @@
             filePath = "Memorize/EmojiMemoryGameView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "45"
-            endingLineNumber = "45"
-            landmarkName = "CardView"
-            landmarkType = "14">
+            startingLineNumber = "54"
+            endingLineNumber = "54"
+            landmarkName = "card"
+            landmarkType = "24">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>
