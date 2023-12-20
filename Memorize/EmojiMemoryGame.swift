@@ -10,7 +10,7 @@
 import SwiftUI
 
 class EmojiMemoryGame: ObservableObject {
-    private static let emojis = ["🐧","🐧","🐥","🐥","🐓","🐓","🦚","🦚","🦃", "🪿", "🦤", "🦩"] // emojis is static but namespaced in the EmojiMemoryGame class. statics are initialized before init
+    private static let emojis = ["🕊️", "🦅", "🦆", "🦜", "🐧", "🦉", "🐤", "🐥", "🦢", "🐓", "🦩", "🦚", "🦃"] // emojis is static but namespaced in the EmojiMemoryGame class. statics are initialized before init
     // property initializers run before self is available, static vars and funcs
     // order of property (member) initialization is undetermined - not in the order declared in the source code
         
